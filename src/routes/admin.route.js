@@ -3,7 +3,7 @@ const express = require("express");
 const validate = require("../middlewares/validate.middleware");
 const verifyToken = require("../middlewares/auth.middleware");
 const { categorySchema } = require("../validators/category.validator");
-const { createCategory, getCategories, deleteCategory, updateCategory } = require("../controllers/category.controller");
+const { createCategory, deleteCategory, updateCategory } = require("../controllers/category.controller");
 const authorizedRole = require("../middlewares/role.middleware");
 const { deleteBlog } = require("../controllers/blog.controller");
 
@@ -28,7 +28,7 @@ router.delete("/users/:id", deleteUser);
 router.post("/category", validate(categorySchema), createCategory);
 router.delete("/category/:id", deleteCategory);
 router.put("/category/:id", validate(categorySchema), updateCategory);
-router.get("/category", getCategories)
+
 
 // manage blog
 router.get("/blog", getBlogs);

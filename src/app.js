@@ -9,6 +9,7 @@ const commentRoute = require("./routes/comment.route")
 
 const dashboardRoute = require("./routes/dashboard.route")
 
+const publicRoute = require("./routes/public.route")
 app.use(express.json());
 app.use(cookieParser());
 
@@ -26,5 +27,7 @@ app.use("/api/blog/", blogRoute);
 app.use("/api/comment/", commentRoute);
 
 app.use("/api/dashboard/", dashboardRoute);
+
+app.use("/api", publicRoute)
 
 module.exports = app;

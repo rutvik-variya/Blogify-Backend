@@ -83,5 +83,16 @@ const toggleBookmark = async (req, res) => {
     }
 }
 
-module.exports = { createBlog, deleteBlog, updateBlog, getAllBlog, getSingleBlog, toggleLike, toggleBookmark }
+
+const latestBlog = async (req, res) => {
+    try {
+
+    }
+    catch (err) {
+        console.log(err)
+        return res.status(500).json(new ApiError(500, "Internal server error"));
+    }
+}
+
+module.exports = { createBlog, deleteBlog, updateBlog, getAllBlog, getSingleBlog, toggleLike, toggleBookmark, latestBlog }
 
