@@ -1,6 +1,6 @@
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
-const { createNewBlog, removeBlog, editBlog, getBlog, fetchSingleBlog, toggledLike, toggledBookmark } = require("../services/blog.service")
+const { createNewBlog, removeBlog, editBlog, getBlog, fetchSingleBlog, toggledLike, toggledBookmark, latestBlogService } = require("../services/blog.service")
 
 const createBlog = async (req, res) => {
     try {
@@ -86,7 +86,8 @@ const toggleBookmark = async (req, res) => {
 
 const latestBlog = async (req, res) => {
     try {
-
+        const blog = await latestBlogService();
+        return res.status(200).json(new ApiResponse(200, "Latest Blog", { blog }));
     }
     catch (err) {
         console.log(err)

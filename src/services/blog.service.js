@@ -232,6 +232,19 @@ const toggledBookmark = async (blogId, userId) => {
     }
 }
 
-module.exports = { createNewBlog, removeBlog, editBlog, getBlog, fetchSingleBlog, toggledLike, toggledBookmark }
+const latestBlogService = async () => {
+    const blog = await blogModel.find({ status: "published" })
+        .populate("author", "name avtar")
+        .populate("category", "name")
+        .sort({ createdAt: -1 })
+        .limit(3);
+
+    if (!blog) {
+        throw new ApiError(404, "Blog not Found")
+    }
+    return blog;
+}
+
+module.exports = { createNewBlog, removeBlog, editBlog, getBlog, fetchSingleBlog, toggledLike, toggledBookmark, latestBlogService }
 
 
