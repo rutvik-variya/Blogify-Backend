@@ -12,6 +12,7 @@ router.post("/", verifyToken, upload.single("image"), validate(blogSchema), crea
 router.delete("/:id", verifyToken, deleteBlog)
 router.put("/:id", verifyToken, upload.single("image"), validate(updateBlogSchema), updateBlog)
 
+// like and bookmark 
 router.patch("/:id/like", verifyToken, toggleLike)
 router.patch("/:id/bookmark", verifyToken, toggleBookmark)
 

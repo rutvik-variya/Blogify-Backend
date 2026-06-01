@@ -30,4 +30,4 @@ app.use("/api/dashboard/", dashboardRoute);
 
 app.use("/api", publicRoute)
 
-module.exports = app;
+module.exports = app;   

@@ -170,7 +170,7 @@ const getBlog = async (queryData) => {
     }
 
     const blogs = await blogModel.find(query)
-        .populate("author", "name")
+        .populate("author", "name avtar")
         .populate("category", "name")
         .sort(sortOption)
 
