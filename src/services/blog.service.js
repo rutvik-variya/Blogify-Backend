@@ -142,7 +142,7 @@ const editBlog = async (id, req) => {
 
 const getBlog = async (queryData) => {
     // default set default value
-    const { search, category, sort = "latest" } = queryData;
+    const { search, category, sort = "latest", page = 1, limit = 3 } = queryData;
 
     const query = {
         status: "published"
@@ -169,14 +169,30 @@ const getBlog = async (queryData) => {
         sortOption = { createdAt: 1 }
     }
 
+    // pagination logic for infinite scrolling
+
+    const currentPage = Number(page);
+    const perPage = Number(limit);
+    const skip = (currentPage - 1) * perPage
+
+    const totalBlogs = await blogModel.countDocuments(query);
+
     const blogs = await blogModel.find(query)
         .populate("author", "name avtar")
         .populate("category", "name")
         .sort(sortOption)
+        .skip(skip)
+        .limit(perPage)
 
-    return blogs;
+    return {
+        blogs,
+        currentPage,
+        perPage,
+        totalBlogs,
+        totalPage: Math.ceil(totalBlogs / perPage),
+        hasMore: currentPage < Math.ceil(totalBlogs / perPage)
+    }
 }
-
 
 const fetchSingleBlog = async (slug) => {
     const blog = await blogModel.findOne({
@@ -246,5 +262,3 @@ const latestBlogService = async () => {
 }
 
 module.exports = { createNewBlog, removeBlog, editBlog, getBlog, fetchSingleBlog, toggledLike, toggledBookmark, latestBlogService }
-
-

@@ -9,10 +9,9 @@ const verfiyToken = require("../middlewares/auth.middleware");
 const authorizedRole = require("../middlewares/role.middleware");
 
 router.post("/:blogId", verifyToken, validate(commentSchema), createComment)
-router.get("/:blogId", getBlogComment)
+
 router.delete("/:commentId", verifyToken, deleteComment)
 
+router.get("/:blogId", getBlogComment)
+
 module.exports = router;
-
-
-

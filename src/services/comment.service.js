@@ -52,4 +52,3 @@ const removeComment = async (commentId, user) => {
 }
 
 module.exports = { createNewComment, getComment, removeComment }
-
