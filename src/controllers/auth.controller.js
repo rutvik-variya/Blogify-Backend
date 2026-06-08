@@ -4,7 +4,7 @@ const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 
 const { generateAccessToken, generateRefreshToken } = require("../utils/generateToken")
-const { createUser, comparePassword } = require("../services/auth.service");
+const { createUser, comparePassword, getProfileService, updateProfileService } = require("../services/auth.service");
 
 
 const jwt = require("jsonwebtoken");
@@ -135,4 +135,28 @@ const logout = async (req, res) => {
 }
 
 
-module.exports = { register, login, refreshToken, logout }
+const getProfile = async (req, res) => {
+    try {
+        const result = await getProfileService(req.user.id);
+        return res.status(200).json(new ApiResponse(200, "Profile fetched successfully", { result }));
+    }
+    catch (err) {
+        console.log(err)
+        return res.status(500).json(new ApiError(500, "Internal server error"));
+    }
+}
+
+const updateProfile = async (req, res) => {
+    try {
+        const { name, username, email, avtar } = req.body;
+        const result = await updateProfileService(req.user.id, { name, username, email, avtar });
+
+        return res.status(200).json(new ApiResponse(200, "Profile Updated Successfully", { result }));
+    }
+    catch (err) {
+        console.log(err)
+        return res.status(500).json(new ApiError(500, "Internal server error"));
+    }
+}
+
+module.exports = { register, login, refreshToken, logout, getProfile, updateProfile }

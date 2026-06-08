@@ -16,4 +16,27 @@ const comparePassword = async (hashedPassword, password) => {
 }
 
 
-module.exports = { createUser, comparePassword }
+const getProfileService = async (userId) => {
+    const profileUser = await user.findById(userId).select(
+        "-password -refreshToken"
+    )
+    if (!profileUser) {
+        throw new ApiError(400, "User not found")
+    }
+    return profileUser
+}
+
+
+const updateProfileService = async (userId, data) => {
+    const updatedUser = await user.findByIdAndUpdate(userId, data, {
+        new: true,
+        runValidators: true
+    }).select(" -password -refreshToken")
+
+    if (!updatedUser) {
+        throw new ApiError(400, "user not updated")
+    }
+    return updatedUser;
+}
+
+module.exports = { createUser, comparePassword, getProfileService, updateProfileService }

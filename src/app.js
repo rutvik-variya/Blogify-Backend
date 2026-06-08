@@ -10,6 +10,7 @@ const commentRoute = require("./routes/comment.route")
 const dashboardRoute = require("./routes/dashboard.route")
 
 const publicRoute = require("./routes/public.route")
+
 app.use(express.json());
 app.use(cookieParser());
 

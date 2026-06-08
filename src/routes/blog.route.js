@@ -8,9 +8,9 @@ const upload = require("../middlewares/upload.middleware")
 const router = express.Router();
 
 
-router.post("/", verifyToken, upload.single("image"), validate(blogSchema), createBlog);
+router.post("/", verifyToken, upload.single("featuredImage"), validate(blogSchema), createBlog);
 router.delete("/:id", verifyToken, deleteBlog)
-router.put("/:id", verifyToken, upload.single("image"), validate(updateBlogSchema), updateBlog)
+router.put("/:id", verifyToken, upload.single("featuredImage"), validate(updateBlogSchema), updateBlog)
 
 // like and bookmark 
 router.patch("/:id/like", verifyToken, toggleLike)
