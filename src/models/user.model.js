@@ -26,8 +26,14 @@ const userSchema = new mongoose.Schema({
         minlength: 8
     },
     avtar: {
-        type: String,
-        default: "",
+        public_id: {
+            type: String,
+            default: ""
+        },
+        url: {
+            type: String,
+            default: ""
+        }
     },
     role: {
         type: String,

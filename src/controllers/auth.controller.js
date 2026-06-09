@@ -4,7 +4,7 @@ const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 
 const { generateAccessToken, generateRefreshToken } = require("../utils/generateToken")
-const { createUser, comparePassword, getProfileService, updateProfileService } = require("../services/auth.service");
+const { createUser, comparePassword, getProfileService, updateProfileService, changePasswordService } = require("../services/auth.service");
 
 
 const jwt = require("jsonwebtoken");
@@ -74,6 +74,7 @@ const login = async (req, res) => {
                     username: user.username,
                     email: user.email,
                     role: user.role,
+                    avtar:user.avtar
                 },
                 accessToken,
             })
@@ -148,10 +149,25 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const { name, username, email, avtar } = req.body;
-        const result = await updateProfileService(req.user.id, { name, username, email, avtar });
+        const updateData = {};
+        if (req.body.name) {
+            updateData.name = req.body.name;
+        }
 
-        return res.status(200).json(new ApiResponse(200, "Profile Updated Successfully", { result }));
+        if (req.body.username) {
+            updateData.username = req.body.username;
+        }
+
+        if (req.body.email) {
+            updateData.email = req.body.email;
+        }
+
+        if (req.file) {
+            updateData.avtar = req.file.path;
+        }
+
+        const updatedUser = await updateProfileService(req.user.id, updateData);
+        return res.status(200).json(new ApiResponse(200, "Profile Updated Successfully", { updatedUser }));
     }
     catch (err) {
         console.log(err)
@@ -159,4 +175,23 @@ const updateProfile = async (req, res) => {
     }
 }
 
-module.exports = { register, login, refreshToken, logout, getProfile, updateProfile }
+const changeUserPassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const existUser = await userModel.findById(req.user.id);
+
+        const isPasswordValid = await comparePassword(existUser.password, currentPassword);
+        if (!isPasswordValid) {
+            return res.status(400).json(new ApiError(400, "Current password is incorrect"));
+        }
+
+        await changePasswordService(req.user.id, newPassword);
+        return res.status(200).json(new ApiResponse(200, "Password changed sucessfully"));
+    }
+    catch (err) {
+        console.log(err)
+        return res.status(500).json(new ApiError(500, "Internal server error"));
+    }
+}
+
+module.exports = { register, login, refreshToken, logout, getProfile, updateProfile, changeUserPassword }

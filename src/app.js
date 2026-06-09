@@ -29,6 +29,6 @@ app.use("/api/comment/", commentRoute);
 
 app.use("/api/dashboard/", dashboardRoute);
 
-app.use("/api", publicRoute)
+app.use("/api", publicRoute);
 
 module.exports = app;   
