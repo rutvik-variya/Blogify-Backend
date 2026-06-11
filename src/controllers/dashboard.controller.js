@@ -1,7 +1,7 @@
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
 
-const { getDashboardStatsService, getReacentBlogService, getDraftBlogsService, getBookmarkBlogsService, getUserActivityService } =
+const { getDashboardStatsService, getReacentBlogService, getMyBlogService, getBookmarkBlogsService, getUserActivityService } =
     require("../services/dashboard.service");
 
 
@@ -29,17 +29,6 @@ const getRecentsBlogs = async (req, res) => {
 }
 
 
-const getDraftBlogs = async (req, res) => {
-    try {
-        const result = await getDraftBlogsService(req.user.id);
-        return res.status(200).json(new ApiResponse(200, "Get Draft Blogs", { result }));
-    }
-    catch (err) {
-        console.log(err)
-        return res.status(500).json(new ApiError(500, "Internal server error"));
-    }
-}
-
 const getBookmarkBlogs = async (req, res) => {
     try {
         const result = await getBookmarkBlogsService(req.user.id);
@@ -62,4 +51,15 @@ const getUserActivity = async (req, res) => {
     }
 }
 
-module.exports = { getDashboardStats, getRecentsBlogs, getDraftBlogs, getBookmarkBlogs, getUserActivity }
+
+const getMyBlogs = async (req, res) => {
+    try {
+        const result = await getMyBlogService(req.user.id, req.query);
+        return res.status(200).json(new ApiResponse(200, "Blog fetch successfully", { result }));
+    }
+    catch (err) {
+        console.log(err)
+        return res.status(500).json(new ApiError(500, "Internal server error"));
+    }
+}
+module.exports = { getDashboardStats, getRecentsBlogs, getMyBlogs, getBookmarkBlogs, getUserActivity }

@@ -52,17 +52,6 @@ const getReacentBlogService = async (userId) => {
     return recentBlogs;
 }
 
-
-const getDraftBlogsService = async (userId) => {
-    const draftBlogs = await blogModel.find({
-        author: userId,
-        status: "draft"
-    })
-
-    return draftBlogs;
-}
-
-
 const getBookmarkBlogsService = async (userId) => {
     const bookmarkBlogs = await blogModel.find({
         bookmarks: userId,
@@ -84,6 +73,26 @@ const getUserActivityService = async (userId) => {
 
     return recentComment;
 }
-module.exports = { getDashboardStatsService, getReacentBlogService, getDraftBlogsService, getBookmarkBlogsService, getUserActivityService }
+
+
+const getMyBlogService = async (userId, query) => {
+    const { status } = query;
+
+    const filter = {
+        author: userId
+    }
+
+    if (status) {
+        filter.status = status;
+    }
+
+    const blogs = await blogModel.find(filter)
+        .populate("category", "name")
+        .sort({ createdAt: -1 });
+
+    return blogs;
+}
+
+module.exports = { getDashboardStatsService, getReacentBlogService, getMyBlogService, getBookmarkBlogsService, getUserActivityService }
 
 
