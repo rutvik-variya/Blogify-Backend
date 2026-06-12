@@ -39,6 +39,7 @@ const createNewBlog = async (req) => {
         };
 
         const blog = await blogModel.create(blogData);
+        await blogModel.save();
         return blog;
 
     } catch (err) {
@@ -114,7 +115,7 @@ const editBlog = async (id, req) => {
                 public_id: cloudResult.public_id,
                 url: cloudResult.secure_url
             };
-
+            await blog.save();
         }
         catch (err) {
             console.error("Cloudinary upload error:", err);
