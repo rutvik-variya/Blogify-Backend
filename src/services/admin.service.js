@@ -27,7 +27,7 @@ const getAdminstatService = async () => {
 }
 
 const getUsers = async () => {
-    const users = await userModel.find().select("-password -refreshToken");
+    const users = await userModel.find({ role: "user" }).select("-password -refreshToken");
     if (!users) {
         throw new ApiError(404, "Users not get")
     }
