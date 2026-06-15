@@ -18,7 +18,7 @@ const verfiyToken = (req, res, next) => {
         req.user = decode;
         next();
     } catch (err) {
-        res.status(400).json(new ApiError(400, "Token is not valid"))
+        res.status(401).json(new ApiError(401, "Token is not valid"))
     }
 }
 

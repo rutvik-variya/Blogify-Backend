@@ -35,16 +35,16 @@ const login = async (req, res) => {
         const user = await userModel.findOne({ email });
 
         if (!user) {
-            return res.status(400).json(
-                new ApiError(400, "Invalid credentials")
+            return res.status(401).json(
+                new ApiError(401, "Invalid credentials")
             );
         }
 
         const matchPassword = await comparePassword(user.password, password);
 
         if (!matchPassword) {
-            return res.status(400).json(
-                new ApiError(400, "Invalid credentials")
+            return res.status(401).json(
+                new ApiError(401, "Invalid credentials")
             );
         }
 
@@ -74,7 +74,7 @@ const login = async (req, res) => {
                     username: user.username,
                     email: user.email,
                     role: user.role,
-                    avtar:user.avtar
+                    avtar: user.avtar
                 },
                 accessToken,
             })
