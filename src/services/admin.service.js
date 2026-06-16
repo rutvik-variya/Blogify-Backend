@@ -43,7 +43,9 @@ const removeUser = async (userId) => {
 }
 
 const fetchBlog = async () => {
-    const blogs = await blogModel.find();
+    const blogs = await blogModel.find()
+        .populate("author", "name avtar")
+        .populate("category", "name")
     if (!blogs) {
         throw new ApiError(404, "blogs not get")
     }

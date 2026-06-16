@@ -10,3 +10,4 @@ router.get("/latestBlog", latestBlog)
 router.get("/category", getCategories)
 
 module.exports = router;
+

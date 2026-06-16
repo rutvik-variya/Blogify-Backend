@@ -54,20 +54,27 @@ const createNewBlog = async (req) => {
 };
 
 const removeBlog = async (id, reqUser) => {
-    const blog = await blogModel.findOne({ _id: id });
+    const blog = await blogModel.findById(id);
+
     if (!blog) {
         throw new ApiError(404, "Blog not found");
     }
 
-    if (blog.author.toString() !== reqUser.id) {
+    const isAuthor = blog.author.toString() === reqUser.id;
+    const isAdmin = reqUser.role === "admin";
+
+    if (!isAuthor && !isAdmin) {
         throw new ApiError(401, "Unauthorized");
     }
 
     if (blog.featuredImage?.public_id) {
         await cloudinary.uploader.destroy(blog.featuredImage.public_id);
     }
+
     await blogModel.findByIdAndDelete(id);
-}
+
+    return blog;
+};
 
 
 const editBlog = async (id, req) => {

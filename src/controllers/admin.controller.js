@@ -18,7 +18,7 @@ const getAdminStats = async (req, res) => {
 const getAllusers = async (req, res) => {
     try {
         const users = await getUsers();
-        return res.status(200).json(new ApiResponse(200, "All Users", users));
+        return res.status(200).json(new ApiResponse(200, "All Users", { users }));
     }
     catch (err) {
         console.log(err)
