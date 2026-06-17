@@ -39,7 +39,6 @@ const createNewBlog = async (req) => {
         };
 
         const blog = await blogModel.create(blogData);
-        await blogModel.save();
         return blog;
 
     } catch (err) {

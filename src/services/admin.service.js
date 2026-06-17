@@ -64,7 +64,11 @@ const toggleBlogStatus = async (blogId, status) => {
 }
 
 const allCommentService = async () => {
-    const comments = await commentModel.find();
+    const comments = await commentModel.find()
+        .populate("user", "name avtar")
+        .populate("blog", "title slug");
+
+
     if (!comments) {
         throw new ApiError(404, "Comments not find")
     }

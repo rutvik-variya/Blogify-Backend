@@ -29,7 +29,6 @@ router.post("/category", validate(categorySchema), createCategory);
 router.delete("/category/:id", deleteCategory);
 router.put("/category/:id", validate(categorySchema), updateCategory);
 
-
 // manage blog
 router.get("/blog", getBlogs);
 router.delete("/blog/:id", deleteBlog)
@@ -40,5 +39,3 @@ router.get("/comments", getAllComments);
 router.delete("/comments/:id", removeComment);
 
 module.exports = router;
-
-
