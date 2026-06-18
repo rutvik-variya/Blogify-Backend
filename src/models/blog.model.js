@@ -15,7 +15,7 @@ const blogSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    except: {
+    excerpt: {
         type: String,
         trim: true
     },

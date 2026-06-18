@@ -3,13 +3,24 @@ const slugify = require("slugify");
 const ApiError = require("../utils/ApiError");
 const cloudinary = require("../config/cloudinary")
 const fs = require("fs")
+const sanitizeHtml = require("sanitize-html");
+
+const getPlainText = (html = "") => {
+    return html
+        .replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+};
+
 
 const createNewBlog = async (req) => {
     const body = req.body;
     const file = req.file;
 
+    const plainText = getPlainText(body.content || "");
+
     if (body.status === "published") {
-        if (!body.content) {
+        if (plainText.length === 0) {
             throw new ApiError(400, "Content is required");
         }
 
@@ -20,6 +31,14 @@ const createNewBlog = async (req) => {
         if (!file) {
             throw new ApiError(400, "Featured image is required");
         }
+
+        if (plainText.length < 50) {
+            throw new ApiError(
+                400,
+                "Published blog must contain at least 50 characters"
+            );
+        }
+
     }
 
     const slug = slugify(body.title, {
@@ -30,8 +49,8 @@ const createNewBlog = async (req) => {
     const blogData = {
         title: body.title,
         slug,
-        content: body.content || "",
-        except: body.except || "",
+        content: sanitizeHtml(body.content || ""),
+        excerpt: body.excerpt || "",
         status: body.status || "draft",
         author: req.user.id,
     };
@@ -95,13 +114,53 @@ const editBlog = async (id, req) => {
     const body = req.body;
     const file = req.file;
 
-    const blog = await blogModel.findOne({ _id: id });
+    const blog = await blogModel.findById(id);
+
     if (!blog) {
-        throw new ApiError(404, "Blog not found")
+        throw new ApiError(404, "Blog not found");
     }
 
     if (blog.author.toString() !== req.user.id) {
         throw new ApiError(401, "Unauthorized");
+    }
+
+    // Validation when publishing
+    if (body.status === "published") {
+        const plainText = getPlainText(
+            body.content !== undefined
+                ? body.content
+                : blog.content
+        );
+
+        if (plainText.length < 50) {
+            throw new ApiError(
+                400,
+                "Published blog must contain at least 50 characters"
+            );
+        }
+
+        const category =
+            body.category !== undefined
+                ? body.category
+                : blog.category;
+
+        if (!category) {
+            throw new ApiError(
+                400,
+                "Category is required"
+            );
+        }
+
+        const hasImage =
+            file ||
+            blog.featuredImage?.url;
+
+        if (!hasImage) {
+            throw new ApiError(
+                400,
+                "Featured image is required"
+            );
+        }
     }
 
     let slug = blog.slug;
@@ -109,51 +168,75 @@ const editBlog = async (id, req) => {
     if (body.title && body.title !== blog.title) {
         slug = slugify(body.title, {
             lower: true,
-            strict: true
+            strict: true,
         });
     }
 
-    // update Data
-    blog.title = body.title || blog.title;
+    // Update fields safely
+
+    if (body.title !== undefined) {
+        blog.title = body.title;
+    }
+
     blog.slug = slug;
-    blog.content = body.content || blog.content
-    blog.except = body.except || blog.except
-    blog.category = body.category || blog.category
-    blog.status = body.status || blog.status
+
+    if (body.content !== undefined) {
+        blog.content = sanitizeHtml(body.content);
+    }
+
+    if (body.excerpt !== undefined) {
+        blog.excerpt = body.excerpt;
+    }
+
+    if (body.category !== undefined) {
+        blog.category = body.category;
+    }
+
+    if (body.status !== undefined) {
+        blog.status = body.status;
+    }
 
     if (file) {
         try {
             if (blog.featuredImage?.public_id) {
-                await cloudinary.uploader.destroy(blog.featuredImage.public_id);
+                await cloudinary.uploader.destroy(
+                    blog.featuredImage.public_id
+                );
             }
 
-            const cloudResult = await cloudinary.uploader.upload(file.path, {
-                resource_type: "auto",
-                folder: "blogs"
-            });
+            const cloudResult =
+                await cloudinary.uploader.upload(
+                    file.path,
+                    {
+                        resource_type: "auto",
+                        folder: "blogs",
+                    }
+                );
 
             blog.featuredImage = {
                 public_id: cloudResult.public_id,
-                url: cloudResult.secure_url
+                url: cloudResult.secure_url,
             };
-            await blog.save();
-        }
-        catch (err) {
-            console.error("Cloudinary upload error:", err);
-            throw new ApiError(400, "Image upload failed");
-        }
-        finally {
+        } catch (err) {
+            console.error(
+                "Cloudinary upload error:",
+                err
+            );
+            throw new ApiError(
+                400,
+                "Image upload failed"
+            );
+        } finally {
             if (file?.path) {
                 fs.unlinkSync(file.path);
             }
         }
     }
 
-    console.log("blog", blog)
     await blog.save();
-    return blog;
-}
 
+    return blog;
+};
 
 // get published blog --
 
