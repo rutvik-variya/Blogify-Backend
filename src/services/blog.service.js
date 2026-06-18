@@ -8,8 +8,18 @@ const createNewBlog = async (req) => {
     const body = req.body;
     const file = req.file;
 
-    if (!file) {
-        throw new ApiError(400, "Featured image is required");
+    if (body.status === "published") {
+        if (!body.content) {
+            throw new ApiError(400, "Content is required");
+        }
+
+        if (!body.category) {
+            throw new ApiError(400, "Category is required");
+        }
+
+        if (!file) {
+            throw new ApiError(400, "Featured image is required");
+        }
     }
 
     const slug = slugify(body.title, {
@@ -20,23 +30,28 @@ const createNewBlog = async (req) => {
     const blogData = {
         title: body.title,
         slug,
-        content: body.content,
-        except: body.except,
-        category: body.category,
+        content: body.content || "",
+        except: body.except || "",
         status: body.status || "draft",
         author: req.user.id,
     };
 
-    try {
-        const cloudResult = await cloudinary.uploader.upload(file.path, {
-            resource_type: "auto",
-            folder: "blogs"
-        });
+    if (body.category) {
+        blogData.category = body.category;
+    }
 
-        blogData.featuredImage = {
-            public_id: cloudResult.public_id,
-            url: cloudResult.secure_url
-        };
+    try {
+        if (file) {
+            const cloudResult = await cloudinary.uploader.upload(file.path, {
+                resource_type: "auto",
+                folder: "blogs",
+            });
+
+            blogData.featuredImage = {
+                public_id: cloudResult.public_id,
+                url: cloudResult.secure_url,
+            };
+        }
 
         const blog = await blogModel.create(blogData);
         return blog;

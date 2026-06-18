@@ -13,7 +13,7 @@ const blogSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: true
+        default: ""
     },
     except: {
         type: String,
@@ -31,7 +31,7 @@ const blogSchema = new mongoose.Schema({
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Category",
-        required: true
+        default: null
     },
     status: {
         type: String,

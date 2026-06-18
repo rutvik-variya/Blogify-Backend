@@ -1,15 +1,22 @@
 const z = require("zod");
 
-
-const blogSchema = z.object({
+const publishBlogSchema = z.object({
     title: z.string().min(5).max(150),
     content: z.string().min(50),
     excerpt: z.string().max(300).optional(),
     category: z.string().min(1, "Category is required"),
-    status: z.enum(["draft", "published"]).optional()
+    status: z.literal("published"),
 });
 
-const updateBlogSchema = blogSchema.partial();
+const draftBlogSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    content: z.string().optional(),
+    excerpt: z.string().optional(),
+    category: z.string().optional(),
+    status: z.literal("draft"),
+});
 
-
-module.exports = { blogSchema, updateBlogSchema }
+module.exports = {
+    publishBlogSchema,
+    draftBlogSchema,
+};
