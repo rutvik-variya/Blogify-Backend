@@ -16,10 +16,7 @@ app.use(cookieParser());
 
 app.use(
     cors({
-        origin: [
-            "http://localhost:5173",
-            "https://blogify-frontend-mocha.vercel.app"
-        ],
+        origin: "https://blogify-frontend-mocha.vercel.app",
         credentials: true,
     })
 );
