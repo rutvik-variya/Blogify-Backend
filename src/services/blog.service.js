@@ -5,6 +5,49 @@ const cloudinary = require("../config/cloudinary")
 const fs = require("fs")
 const sanitizeHtml = require("sanitize-html");
 
+const sanitizeOptions = {
+    allowedTags: [
+        "p",
+        "br",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "strong",
+        "b",
+        "em",
+        "i",
+        "u",
+        "s",
+        "blockquote",
+        "pre",
+        "code",
+        "ol",
+        "ul",
+        "li",
+        "a",
+        "span"
+    ],
+
+    allowedAttributes: {
+        a: ["href", "target", "rel"],
+        span: ["class"],
+        "*": ["style"]
+    },
+
+    allowedSchemes: ["http", "https", "mailto"],
+
+    allowedStyles: {
+        "*": {
+            color: [/^.*$/],
+            "background-color": [/^.*$/],
+            "text-align": [/^left$/, /^center$/, /^right$/]
+        }
+    }
+};
+
 const getPlainText = (html = "") => {
     return html
         .replace(/<[^>]*>/g, "")
@@ -49,7 +92,10 @@ const createNewBlog = async (req) => {
     const blogData = {
         title: body.title,
         slug,
-        content: sanitizeHtml(body.content || ""),
+        content: sanitizeHtml(
+            body.content || "",
+            sanitizeOptions
+        ),
         excerpt: body.excerpt || "",
         status: body.status || "draft",
         author: req.user.id,
@@ -181,7 +227,10 @@ const editBlog = async (id, req) => {
     blog.slug = slug;
 
     if (body.content !== undefined) {
-        blog.content = sanitizeHtml(body.content);
+        blog.content = sanitizeHtml(
+            body.content,
+            sanitizeOptions
+        );
     }
 
     if (body.excerpt !== undefined) {
