@@ -14,9 +14,22 @@ const publicRoute = require("./routes/public.route")
 app.use(express.json());
 app.use(cookieParser());
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    process.env.CLIENT_URL
+];
+
 app.use(
     cors({
-        origin: process.env.CLIENT_URL,
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            return callback(new Error("CORS blocked"));
+        },
         credentials: true,
     })
 );
