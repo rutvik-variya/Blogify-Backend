@@ -107,6 +107,9 @@ const createNewBlog = async (req) => {
 
     try {
         if (file) {
+
+            console.log("file.path =", file.path);
+            console.log("exists =", fs.existsSync(file.path));
             const cloudResult = await cloudinary.uploader.upload(file.path, {
                 resource_type: "auto",
                 folder: "blogs",
@@ -126,8 +129,12 @@ const createNewBlog = async (req) => {
         throw new ApiError(400, "Image upload failed");
     }
     finally {
-        if (file?.path) {
-            fs.unlinkSync(file.path);
+        try {
+            if (file?.path && fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+            }
+        } catch (err) {
+            console.error("File cleanup error:", err);
         }
     }
 };
@@ -276,8 +283,12 @@ const editBlog = async (id, req) => {
                 "Image upload failed"
             );
         } finally {
-            if (file?.path) {
-                fs.unlinkSync(file.path);
+            try {
+                if (file?.path && fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            } catch (err) {
+                console.error("File cleanup error:", err);
             }
         }
     }
