@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const ApiError = require("../utils/ApiError");
-const ApiResponse = require("../utils/ApiError");
+const ApiResponse = require("../utils/ApiResponse");
 
 const verfiyToken = (req, res, next) => {
     // verify using header

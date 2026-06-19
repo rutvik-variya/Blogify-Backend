@@ -53,17 +53,16 @@ const login = async (req, res) => {
 
         user.refreshToken = refreshToken;
         await user.save();
-
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
         });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
         });
 
         return res.status(200).json(
@@ -108,10 +107,9 @@ const refreshToken = async (req, res) => {
 
         res.cookie("accessToken", newAccessToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
         });
-
         return res.status(200).json(new ApiResponse(200, "New AccessToken generated", { newAccessToken }));
     }
     catch (err) {
@@ -125,8 +123,17 @@ const logout = async (req, res) => {
         const user = await userModel.findOne({ _id: req.user.id });
         user.refreshToken = "";
         await user.save();
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
+        res.clearCookie("accessToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
         return res.status(200).json(new ApiResponse(200, "Logout Successfull"));
     }
     catch (err) {
